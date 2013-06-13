@@ -1,21 +1,35 @@
 #!/usr/bin/env ruby
 
-require 'nokogiri'
+require './game_table_row'
 require 'pp'
+require 'nokogiri'
 
-games = []
+module KgsMiner
+  class Parser
+    def initialize filename
+      @filename = filename
+    end
 
-doc = Nokogiri::HTML(open('kgs.xhtml'))
-t = doc.css('table.grid').first
-rows = t.css('tr').to_a
-rows.shift
-rows.each do |r|
-  cells = r.css('td')
-  white = cells[1].css('a').first.text
-  black = cells[2].css('a').first.text
-  timestamp = cells[4].text
-  result = cells[6].text
-  games.push({white: white, black: black, timestamp: timestamp, result: result})
+    def games
+      game_table_rows.map &:to_hash
+    end
+
+    private
+
+    def doc
+      Nokogiri::HTML open @filename
+    end
+
+    def game_table
+      doc.css('table.grid').first
+    end
+
+    def game_table_rows
+      rows = game_table.css('tr').to_a
+      rows.shift # header
+      rows.map { |row| GameTableRow.new(row) }
+    end
+  end
 end
 
-pp games
+pp KgsMiner::Parser.new('kgs.xhtml').games
