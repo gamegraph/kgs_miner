@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 
 require_relative 'game_table_row'
-require 'pp'
 require 'nokogiri'
 
 module KgsMiner
   class Parser
-    def initialize filename
-      @filename = filename
+    def initialize str
+      @str = str
     end
 
     def games
@@ -17,7 +16,7 @@ module KgsMiner
     private
 
     def doc
-      Nokogiri::HTML open @filename
+      Nokogiri::HTML @str
     end
 
     def game_table
