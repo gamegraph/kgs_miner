@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require './game_table_row'
+require_relative 'game_table_row'
 require 'pp'
 require 'nokogiri'
 
@@ -31,5 +31,3 @@ module KgsMiner
     end
   end
 end
-
-pp KgsMiner::Parser.new('kgs.xhtml').games
