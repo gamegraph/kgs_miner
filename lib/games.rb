@@ -1,6 +1,7 @@
 module KgsMiner
   class Games
     def self.uniq_usernames_in games
+      return [] if games.empty?
       usernames = Set.new games.map(&:usernames).flatten
       assert_num_uniq_players(games, usernames)
       usernames.to_a
