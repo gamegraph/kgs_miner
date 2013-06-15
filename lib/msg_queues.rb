@@ -17,18 +17,22 @@ module KgsMiner
     end
 
     def enq_games games
-      return if games.empty?
-      @gameq.send_message JSON[games.map(&:to_hash)]
-      puts sprintf "enqueued: %d games", games.length
+      gms = games.dup
+      until gms.empty? do
+        batch = gms.shift(10)
+        serialized_games = batch.map { |g| JSON[g.to_hash] }
+        @gameq.batch_send *serialized_games
+        puts sprintf "enqueued: %d games", serialized_games.length
+      end
     end
 
     def enq_players usernames
-      return if usernames.empty?
-      players = usernames.map { |un| {kgs_username: un} }
-      @playerq.send_message JSON[players]
-      puts sprintf "enqueued: %d players", usernames.length
-      @kpq.send_message JSON[usernames]
-      puts sprintf "enqueued: %d kgs usernames", usernames.length
+      uns = usernames.dup
+      until uns.empty? do
+        batch = uns.shift(10)
+        enq_player_batch(batch)
+        enq_kp_batch(batch)
+      end
     end
 
     private
@@ -38,6 +42,17 @@ module KgsMiner
         access_key_id: ENV['AWS_ACCESS_KEY_ID'],
         secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
       }
+    end
+
+    def enq_kp_batch usernames
+      @kpq.batch_send *usernames
+      puts sprintf "enqueued: %d kgs usernames", usernames.length
+    end
+
+    def enq_player_batch usernames
+      serialized_players = usernames.map { |un| JSON[{kgs_username: un}] }
+      @playerq.batch_send *serialized_players
+      puts sprintf "enqueued: %d players", serialized_players.length
     end
   end
 end
