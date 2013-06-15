@@ -1,3 +1,4 @@
+require_relative 'game'
 require 'time'
 
 module KgsMiner
@@ -6,13 +7,8 @@ module KgsMiner
       @cells = row.css 'td'
     end
 
-    def to_hash
-      {
-        white: white,
-        black: black,
-        date: time.to_date,
-        result: result
-      }
+    def to_game
+      Game.new white, black, time.to_date, result
     end
 
     private

@@ -6,11 +6,14 @@ require 'nokogiri'
 module KgsMiner
   class Parser
     def initialize str
+      puts sprintf "parser rcd: %d bytes", str.bytesize
       @str = str
     end
 
     def games
-      game_table_rows.map &:to_hash
+      games = game_table_rows.map &:to_game
+      puts sprintf "parsed: %d games", games.length
+      games
     end
 
     private

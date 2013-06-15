@@ -1,29 +1,31 @@
-require 'aws/sqs'
+require 'json'
+require 'pry'
+require_relative 'games'
 require_relative 'parser'
-require 'pp'
+require_relative 'msg_queues'
+
+module KgsMiner
+  class Main
+    def initialize
+      @mqs = MsgQueues.new
+    end
+
+    def run
+      while true do
+        games = []
+        @mqs.poll_docq do |msg|
+          games = Parser.new(msg.body).games
+          @mqs.enq_players Games.uniq_usernames_in games
+          @mqs.enq_games games
+        end
+        sleep 30
+      end
+    end
+  end
+end
 
 # Tell ruby not to buffer stdout
 # https://github.com/ddollar/foreman/wiki/Missing-Output
 $stdout.sync = true
 
-def aws_cred
-  {
-    access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
-  }
-end
-
-sqs = AWS::SQS.new aws_cred
-docq = sqs.queues.named('docs_kgs')
-
-while true do
-  begin
-    docq.poll(idle_timeout: 3) do |msg|
-      puts sprintf "q msg rcd: %d bytes", msg.body.bytesize
-      pp KgsMiner::Parser.new(msg.body).games
-    end
-  rescue
-    $stderr.puts "excp during q poll: $!"
-  end
-  sleep 30
-end
+KgsMiner::Main.new.run
