@@ -5,6 +5,7 @@ module KgsMiner
   class GameTableRow
     def initialize row
       @cells = row.css 'td'
+      assert_length 7, @cells
     end
 
     def to_game
@@ -12,6 +13,12 @@ module KgsMiner
     end
 
     private
+
+    def assert_length n, cells
+      if cells.length != n
+        raise "Expected #{n} cells, found #{@cells.length}"
+      end
+    end
 
     def black
       @cells[2].css('a').first.text.split(' ').first
