@@ -5,5 +5,6 @@ gem 'foreman'
 gem 'nokogiri'
 
 group :test do
+  gem 'pry'
   gem 'rspec'
 end
