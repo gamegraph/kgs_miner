@@ -16,7 +16,7 @@ module KgsMiner
           @mqs.enq_players Games.uniq_usernames_in games
           @mqs.enq_games games
         end
-        sleep 30
+        sleep 60
       end
     end
   end
