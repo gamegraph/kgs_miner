@@ -5,7 +5,11 @@ module KgsMiner
   class GameTableRow
     def initialize row
       @cells = row.css 'td'
-      assert_length 7, @cells
+      assert_cell_count @cells
+    end
+
+    def game?
+      %w[ranked free].include? type
     end
 
     def to_game
@@ -14,9 +18,9 @@ module KgsMiner
 
     private
 
-    def assert_length n, cells
-      if cells.length != n
-        raise "Expected #{n} cells, found #{@cells.length}"
+    def assert_cell_count cells
+      unless [6,7].include? cells.length
+        raise "Unexpected cell count: #{@cells.length}"
       end
     end
 
@@ -32,6 +36,10 @@ module KgsMiner
     # http://pubs.opengroup.org/onlinepubs/009695399/functions/strptime.html
     def time
       Time.strptime @cells[4].text, '%D %I:%M %p'
+    end
+
+    def type
+      @cells[-2].text.downcase
     end
 
     def white

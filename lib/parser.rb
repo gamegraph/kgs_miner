@@ -10,7 +10,7 @@ module KgsMiner
 
     def games
       return [] unless has_game_table?
-      games = game_table_rows.map &:to_game
+      games = game_table_rows.select(&:game?).map &:to_game
       puts sprintf "parsed: %d games", games.length
       games
     end
