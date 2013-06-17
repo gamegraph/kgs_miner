@@ -1,4 +1,3 @@
-require 'json'
 require_relative 'games'
 require_relative 'parser'
 require_relative 'msg_queues'

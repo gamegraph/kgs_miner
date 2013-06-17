@@ -1,4 +1,5 @@
 require 'aws/sqs'
+require 'json'
 
 module KgsMiner
   class MsgQueues
