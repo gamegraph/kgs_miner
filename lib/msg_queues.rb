@@ -5,16 +5,14 @@ module KgsMiner
   class MsgQueues
     def initialize
       sqs = AWS::SQS.new aws_cred
-      @docq = sqs.queues.named('gagra_kgs_docs')
+      @kmonq = sqs.queues.named('gagra_kgs_months')
       @kpq = sqs.queues.named('gagra_kgs_players')
       @gameq = sqs.queues.named('gagra_games')
       @playerq = sqs.queues.named('gagra_players')
     end
 
-    def poll_docq
-      @docq.poll(idle_timeout: 3) do |msg|
-        yield msg
-      end
+    def deq_kmonq
+      @kmonq.receive_message { |msg| yield msg }
     end
 
     def enq_games games
