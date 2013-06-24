@@ -1,8 +1,7 @@
-require 'net/http'
-require 'uri'
 require_relative 'cache/cache'
 require_relative 'cache/connection'
 require_relative 'games'
+require_relative 'kgs'
 require_relative 'parser'
 require_relative 'msg_queues'
 
@@ -32,10 +31,6 @@ module KgsMiner
       @mqs.enq_usernames_to_request(discovered_names)
     end
 
-    def get url
-      Net::HTTP.get URI('http://www.gokgs.com/' + url)
-    end
-
     def sleep_rand
       min = ENV['NAPTIME_MIN'].to_i || 30
       max = ENV['NAPTIME_MAX'].to_i || 60
@@ -43,15 +38,14 @@ module KgsMiner
     end
 
     def process_month url
-      puts "month url: #{url}"
-      if not valid_month_url?(url)
+      if not Kgs.valid_month_url?(url)
         puts "skip url: invalid"
         false
-      elsif requested_recently?(url)
+      elsif @url_cache.hit?(url)
         puts "skip url: requested recently"
         false
       else
-        games = Parser.new(get(url)).games
+        games = Parser.new(Kgs.get(url)).games
         process_games games
         @url_cache << url
         true
@@ -64,17 +58,6 @@ module KgsMiner
       discover_and_enqueue_new_usernames(usernames)
       @mqs.enq_players(usernames)
       @mqs.enq_games(games)
-    end
-
-    def requested_recently? url
-      @url_cache.hit? url
-    end
-
-    def valid_month_url? url
-      /^gameArchives\.jsp
-        \?user=[a-zA-Z0-9]+
-        &year=[0-9]+
-        &month=[0-9]+$/x =~ url
     end
   end
 end

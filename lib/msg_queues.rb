@@ -12,7 +12,10 @@ module KgsMiner
     end
 
     def deq_kmonq
-      @kmonq.receive_message { |msg| yield msg }
+      @kmonq.receive_message do |msg|
+        puts "month url: #{msg.body}"
+        yield msg
+      end
     end
 
     def enq_games games
