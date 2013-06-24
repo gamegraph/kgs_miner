@@ -26,32 +26,30 @@ module KgsMiner
     end
 
     def enq_players usernames
-      uns = usernames.dup
-      until uns.empty? do
-        batch = uns.shift(10)
-        enq_player_batch(batch)
-        enq_kp_batch(batch)
-      end
+      serialized = usernames.map { |un| JSON[{kgs_username: un}] }
+      enq_in_batches serialized, @playerq
+      puts sprintf "enqueued: %d players", serialized.length
+    end
+
+    def enq_usernames_to_request usernames
+      enq_in_batches usernames, @kpq
+      puts sprintf "enqueued: %d kgs usernames", usernames.length
     end
 
     private
+
+    def enq_in_batches usernames, queue
+      uns = usernames.dup
+      until uns.empty? do
+        queue.batch_send *uns.shift(10)
+      end
+    end
 
     def aws_cred
       {
         access_key_id: ENV['AWS_ACCESS_KEY_ID'],
         secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
       }
-    end
-
-    def enq_kp_batch usernames
-      @kpq.batch_send *usernames
-      puts sprintf "enqueued: %d kgs usernames", usernames.length
-    end
-
-    def enq_player_batch usernames
-      serialized_players = usernames.map { |un| JSON[{kgs_username: un}] }
-      @playerq.batch_send *serialized_players
-      puts sprintf "enqueued: %d players", serialized_players.length
     end
   end
 end
