@@ -4,6 +4,7 @@ module KgsMiner
       return [] if games.empty?
       usernames = Set.new games.map(&:usernames).flatten
       assert_num_uniq_players(games, usernames)
+      puts sprintf "parsed: %d distinct usernames", usernames.length
       usernames.to_a
     end
 

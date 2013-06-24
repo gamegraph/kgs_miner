@@ -25,10 +25,9 @@ module KgsMiner
     private
 
     def discover_and_enqueue_new_usernames usernames
-      puts sprintf "unique: %d usersnames", usernames.length
-      discovered_names = @uname_cache.discover(usernames)
-      puts sprintf "discovered: %d usersnames", discovered_names.length
-      @mqs.enq_usernames_to_request(discovered_names)
+      discovered = @uname_cache.discover(usernames)
+      puts sprintf "discovered: %d usersnames", discovered.length
+      @mqs.enq_usernames_to_request discovered
     end
 
     def sleep_rand
