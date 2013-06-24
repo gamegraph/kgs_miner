@@ -51,18 +51,19 @@ module KgsMiner
         puts "skip url: requested recently"
         false
       else
-        process_valid_month url
+        games = Parser.new(get(url)).games
+        process_games games
+        @url_cache << url
         true
       end
     end
 
-    def process_valid_month url
-      games = Parser.new(get(url)).games
+    def process_games games
+      return if games.empty?
       usernames = Games.uniq_usernames_in(games)
       discover_and_enqueue_new_usernames(usernames)
       @mqs.enq_players(usernames)
       @mqs.enq_games(games)
-      @url_cache << url
     end
 
     def requested_recently? url
