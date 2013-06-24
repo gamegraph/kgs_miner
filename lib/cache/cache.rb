@@ -9,6 +9,7 @@ module KgsMiner
         @read_only = opts[:read_only] || false
       end
 
+      # `discover` returns an array, the subset of `strs` not found in the cache.
       def discover strs
         in_clause = 1.upto(strs.length).map { |i| "$" + i.to_s }.join(', ')
         qry = "select #{column} from #{table} where #{column} in (#{in_clause})"
@@ -16,12 +17,14 @@ module KgsMiner
         (Set.new(strs) - rslt.field_values(column)).to_a
       end
 
+      # `hit?` returns boolean indicating whether `str` was found in the cache.
       def hit? str
         qry = "select * from #{table} where url = $1 limit 1"
         rslt = @conn.exec_params qry, [str]
         rslt.ntuples == 1
       end
 
+      # `<<` inserts `str` in the cache.
       def << str
         raise "Cache is readonly" if @read_only
         begin
