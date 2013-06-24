@@ -16,13 +16,9 @@ module KgsMiner
     end
 
     def enq_games games
-      gms = games.dup
-      until gms.empty? do
-        batch = gms.shift(10)
-        serialized_games = batch.map { |g| JSON[g.to_hash] }
-        @gameq.batch_send *serialized_games
-        puts sprintf "enqueued: %d games", serialized_games.length
-      end
+      serialized = games.map &:to_json
+      enq_in_batches serialized, @gameq
+      puts sprintf "enqueued: %d games", serialized.length
     end
 
     def enq_players usernames
@@ -38,10 +34,10 @@ module KgsMiner
 
     private
 
-    def enq_in_batches usernames, queue
-      uns = usernames.dup
-      until uns.empty? do
-        queue.batch_send *uns.shift(10)
+    def enq_in_batches messages, queue
+      msgs = messages.dup
+      until msgs.empty? do
+        queue.batch_send *msgs.shift(10)
       end
     end
 

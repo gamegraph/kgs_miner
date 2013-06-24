@@ -1,3 +1,5 @@
+require 'json'
+
 module KgsMiner
   class Game
 
@@ -16,6 +18,10 @@ module KgsMiner
 
     def to_hash
       {white: white, black: black, date: date, result: result}
+    end
+
+    def to_json
+      JSON[to_hash]
     end
   end
 end
