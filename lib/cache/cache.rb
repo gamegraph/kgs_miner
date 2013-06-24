@@ -11,6 +11,7 @@ module KgsMiner
 
       # `discover` returns an array, the subset of `strs` not found in the cache.
       def discover strs
+        return [] if strs.empty?
         in_clause = 1.upto(strs.length).map { |i| "$" + i.to_s }.join(', ')
         qry = "select #{column} from #{table} where #{column} in (#{in_clause})"
         rslt = @conn.exec_params qry, strs
