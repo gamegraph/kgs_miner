@@ -1,4 +1,3 @@
-require 'active_record'
 require_relative 'activerecords/kgs_month_url'
 require_relative 'activerecords/kgs_username'
 require_relative 'games'
@@ -26,9 +25,8 @@ module KgsMiner
     def discover_and_enqueue_new_usernames usernames
       known = KgsUsername.where('un in (?)', usernames).to_a.map(&:un)
       discovered = (Set.new(usernames) - known).to_a
-      puts sprintf "discovered: %d usersnames", discovered.length
-      KgsUsername.create! discovered.map { |un| {un: un, requested: false} }
-      puts sprintf "inserted: %d usersnames", discovered.length
+      puts sprintf "discovered: %d usernames", discovered.length
+      KgsUsername.import_newly_discovered(discovered)
     end
 
     def sleep_rand
