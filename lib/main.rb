@@ -1,5 +1,6 @@
-require_relative 'cache/cache'
-require_relative 'cache/connection'
+require 'active_record'
+require_relative 'activerecords/kgs_month_url'
+require_relative 'activerecords/kgs_username'
 require_relative 'games'
 require_relative 'kgs'
 require_relative 'parser'
@@ -9,9 +10,7 @@ module KgsMiner
   class Main
     def initialize
       @mqs = MsgQueues.new
-      ccon = Cache::Connection.new
-      @url_cache = Cache::MonthUrlCache.new ccon
-      @uname_cache = Cache::UsernameCache.new ccon, read_only: true
+      ActiveRecord::Base.establish_connection ENV.fetch 'DATABASE_URL'
     end
 
     def run
@@ -25,7 +24,8 @@ module KgsMiner
     private
 
     def discover_and_enqueue_new_usernames usernames
-      discovered = @uname_cache.discover(usernames)
+      known = KgsUsername.where('un in (?)', usernames).to_a.map(&:un)
+      discovered = (Set.new(usernames) - known).to_a
       puts sprintf "discovered: %d usersnames", discovered.length
       @mqs.enq_usernames_to_request discovered
     end
@@ -40,13 +40,13 @@ module KgsMiner
       if not Kgs.valid_month_url?(url)
         puts "skip url: invalid"
         false
-      elsif @url_cache.hit?(url)
+      elsif KgsMonthUrl.exists? url: url
         puts "skip url: requested recently"
         false
       else
         games = Parser.new(Kgs.get(url)).games
         process_games games
-        @url_cache << url
+        KgsMonthUrl.create! url: url
         true
       end
     end
