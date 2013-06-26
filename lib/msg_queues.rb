@@ -6,7 +6,6 @@ module KgsMiner
     def initialize
       sqs = AWS::SQS.new aws_cred
       @kmonq = sqs.queues.named('gagra_kgs_months')
-      @kpq = sqs.queues.named('gagra_kgs_players')
       @gameq = sqs.queues.named('gagra_games')
       @playerq = sqs.queues.named('gagra_players')
     end
@@ -28,11 +27,6 @@ module KgsMiner
       serialized = usernames.map { |un| JSON[{kgs_username: un}] }
       enq_in_batches serialized, @playerq
       puts sprintf "enqueued: %d players", serialized.length
-    end
-
-    def enq_usernames_to_request usernames
-      enq_in_batches usernames, @kpq
-      puts sprintf "enqueued: %d kgs usernames", usernames.length
     end
 
     private

@@ -27,7 +27,8 @@ module KgsMiner
       known = KgsUsername.where('un in (?)', usernames).to_a.map(&:un)
       discovered = (Set.new(usernames) - known).to_a
       puts sprintf "discovered: %d usersnames", discovered.length
-      @mqs.enq_usernames_to_request discovered
+      KgsUsername.create! discovered.map { |un| {un: un, requested: false} }
+      puts sprintf "inserted: %d usersnames", discovered.length
     end
 
     def sleep_rand
@@ -47,6 +48,7 @@ module KgsMiner
         games = Parser.new(Kgs.get(url)).games
         process_games games
         KgsMonthUrl.create! url: url
+        puts "done with that url!"
         true
       end
     end
