@@ -3,6 +3,8 @@ require 'activerecord-import'
 
 # Represents a kgs username that has already been requested.
 class KgsUsername < ActiveRecord::Base
+  attr_accessible :requested, :un
+
   validates :requested, inclusion: { in: [true, false] }
   validates :un, presence: true, uniqueness: true
 
