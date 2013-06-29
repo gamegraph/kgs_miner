@@ -59,7 +59,6 @@ module KgsMiner
       return if games.empty?
       usernames = Games.uniq_usernames_in(games)
       discover_and_enqueue_new_usernames(usernames)
-      @mqs.enq_players(usernames)
       @mqs.enq_games(games)
     end
   end
