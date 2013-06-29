@@ -5,16 +5,8 @@ module KgsMiner
   class MsgQueues
     def initialize
       sqs = AWS::SQS.new aws_cred
-      @kmonq = sqs.queues.named('gagra_kgs_months')
       @gameq = sqs.queues.named('gagra_games')
       @playerq = sqs.queues.named('gagra_players')
-    end
-
-    def deq_kmonq
-      @kmonq.receive_message do |msg|
-        puts "month url: #{msg.body}"
-        yield msg
-      end
     end
 
     def enq_games games

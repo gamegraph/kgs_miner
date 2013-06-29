@@ -10,12 +10,18 @@ module KgsMiner
     def initialize
       @mqs = MsgQueues.new
       ActiveRecord::Base.establish_connection ENV.fetch 'DATABASE_URL'
+      ActiveRecord::Base.mass_assignment_sanitizer = :strict
     end
 
     def run
       while true do
         req_sent = false
-        @mqs.deq_kmonq { |msg| req_sent = process_month(msg.body) }
+        m = KgsMonthUrl.where(requested: false).first
+        if m.present?
+          req_sent = process_month(m)
+        else
+          sleep 60 # sleep a long time b/c the queue is empty
+        end
         sleep_rand if req_sent
       end
     end
@@ -35,18 +41,16 @@ module KgsMiner
       sleep rand (min..max)
     end
 
-    def process_month url
+    def process_month month
+      url = month.url
+      puts "month url: #{url}"
       if not Kgs.valid_month_url?(url)
         puts "skip url: invalid"
-        false
-      elsif KgsMonthUrl.exists? url: url
-        puts "skip url: requested recently"
         false
       else
         games = Parser.new(Kgs.get(url)).games
         process_games games
-        KgsMonthUrl.create! url: url
-        puts "done with that url!"
+        month.update_attributes!(requested: true)
         true
       end
     end
