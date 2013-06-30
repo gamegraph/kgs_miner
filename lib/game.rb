@@ -5,9 +5,12 @@ module KgsMiner
 
     attr_reader :white, :black, :date, :result
 
+    # KGS usernames are case-insensitively unique.  KGS itself
+    # keeps track of the current capitalization of a username,
+    # but we don't care, thus we `downcase` here and in our database.
     def initialize white, black, date, result
-      @white = white
-      @black = black
+      @white = white.downcase
+      @black = black.downcase
       @date = date
       @result = result
     end
