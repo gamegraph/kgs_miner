@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/gamegraph/ar_gagra.git
+  revision: 01a698688876d8838119eff9b2fc6da50c989185
+  specs:
+    ar_gagra (0.0.1)
+      activerecord
+      activerecord-import
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -10,6 +18,7 @@ GEM
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
     activerecord-import (0.3.1)
+      activerecord (~> 3.0)
       activerecord (~> 3.0)
     activesupport (3.2.13)
       i18n (= 0.6.1)
@@ -55,8 +64,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
-  activerecord-import
+  ar_gagra!
   aws-sdk
   foreman
   nokogiri

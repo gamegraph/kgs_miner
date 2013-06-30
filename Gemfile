@@ -1,8 +1,7 @@
 ruby '1.9.3'
 source 'https://rubygems.org'
 
-gem 'activerecord'
-gem 'activerecord-import'
+gem 'ar_gagra', :github => 'gamegraph/ar_gagra'
 gem 'aws-sdk'
 gem 'foreman'
 gem 'pg'

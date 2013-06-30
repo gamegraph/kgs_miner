@@ -1,5 +1,4 @@
-require_relative 'activerecords/kgs_month_url'
-require_relative 'activerecords/kgs_username'
+Bundler.require
 require_relative 'games'
 require_relative 'kgs'
 require_relative 'parser'
@@ -9,8 +8,7 @@ module KgsMiner
   class Main
     def initialize
       @mqs = MsgQueues.new
-      ActiveRecord::Base.establish_connection ENV.fetch 'DATABASE_URL'
-      ActiveRecord::Base.mass_assignment_sanitizer = :strict
+      ArGagra.connect
     end
 
     def run
