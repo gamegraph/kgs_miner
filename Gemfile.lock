@@ -1,10 +1,11 @@
 GIT
   remote: git://github.com/gamegraph/ar_gagra.git
-  revision: 01a698688876d8838119eff9b2fc6da50c989185
+  revision: b04f7976e9bc6ea36f8f89753ca43113b93da798
   specs:
     ar_gagra (0.0.1)
       activerecord
       activerecord-import
+      pg
 
 GEM
   remote: https://rubygems.org/
@@ -68,6 +69,5 @@ DEPENDENCIES
   aws-sdk
   foreman
   nokogiri
-  pg
   pry
   rspec
