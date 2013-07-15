@@ -3,6 +3,12 @@ require 'nokogiri'
 
 module KgsMiner
   class Parser
+
+    SORRY_MSGS = [
+      "there are no games in the archives",
+      "did not play any games during"
+    ]
+
     def initialize str
       puts sprintf "parser rcd: %d bytes", str.bytesize
       @doc = Nokogiri::HTML str
@@ -16,12 +22,17 @@ module KgsMiner
     end
 
     def has_game_table?
-      if all_text.include? "did not play any games during"
+      if has_sorry_message?
         puts "parser: no game table"
         false
       else
         true
       end
+    end
+
+    def has_sorry_message?
+      txt = all_text
+      SORRY_MSGS.any? { |sorry| txt.include?(sorry) }
     end
 
     private
